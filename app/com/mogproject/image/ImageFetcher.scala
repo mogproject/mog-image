@@ -6,13 +6,13 @@ import com.sksamuel.scrimage.Image
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import play.api.Logger
 import play.api.routing.sird.QueryString
-
-import scala.util.{Failure, Success, Try}
+import com.redis.serialization.Parse.Implicits._
+import scala.util.{Failure, Try}
 
 /**
   *
   */
-object ImageFetcher {
+object ImageFetcher extends RedisCache {
 
   lazy val config: DesiredCapabilities = {
     val c = new DesiredCapabilities()
@@ -53,8 +53,7 @@ object ImageFetcher {
     n <- Try(x.toInt).toOption
   } yield math.max(Settings.minImageSize, math.min(n, Settings.maxImageSize))).getOrElse(Settings.defaultImageSize)
 
-  def get(queryString: QueryString): Try[Array[Byte]] = {
-    // todo: check cache
+  def get(queryString: QueryString): Try[Array[Byte]] = withCache(queryString.hashCode()) {
     val imageWidth = getImageWidth(queryString.get("size"))
     val url = Settings.playgroundURL + "?" + convertQueryString(queryString).map { case (k, v) => k + "=" + v.head }.mkString("&")
 
@@ -68,6 +67,6 @@ object ImageFetcher {
       dr.close()
       im
     }
-    // todo: set to cache
   }
+
 }
