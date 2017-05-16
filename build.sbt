@@ -11,6 +11,7 @@ resolvers += "jitpack" at "https://jitpack.io" // for ghostdriver
 
 libraryDependencies += filters
 libraryDependencies ++= Seq(
+  "com.typesafe" % "config" % "1.3.1",
   "com.github.detro" % "ghostdriver" % "2.0.0",
   "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.7",
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test
