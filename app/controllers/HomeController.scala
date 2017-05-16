@@ -1,24 +1,20 @@
 package controllers
 
 import javax.inject._
-import play.api._
+
+import com.mogproject.image.ImageFetcher
 import play.api.mvc._
 
-/**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
+import scala.util.{Failure, Success}
+
 @Singleton
 class HomeController @Inject() extends Controller {
-
-  /**
-   * Create an Action to render an HTML page.
-   *
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
-  def index = Action { implicit request =>
-    Ok(views.html.index())
+  def image = Action { implicit request =>
+    ImageFetcher.get(request.queryString) match {
+      case Success(bytes) =>
+        Ok(bytes).as("image/png")
+      case Failure(e) =>
+        InternalServerError("Internal Server Error")
+    }
   }
 }

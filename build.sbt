@@ -7,8 +7,14 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.11"
 
+resolvers += "jitpack" at "https://jitpack.io" // for ghostdriver
+
 libraryDependencies += filters
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test
+libraryDependencies ++= Seq(
+  "com.github.detro" % "ghostdriver" % "2.0.0",
+  "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.7",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test
+)
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.mogproject.controllers._"
