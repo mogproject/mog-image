@@ -3,4 +3,4 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-GET    /image.png                   controllers.HomeController.image
+GET    /snapshot.png                   controllers.HomeController.image

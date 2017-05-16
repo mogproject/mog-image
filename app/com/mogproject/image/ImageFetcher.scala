@@ -1,28 +1,18 @@
 package com.mogproject.image
 
-import java.net.URL
 import java.util.Base64
 
 import com.sksamuel.scrimage.Image
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import play.api.Logger
 import play.api.routing.sird.QueryString
-
-import scala.util.{Failure, Success, Try}
+import com.redis.serialization.Parse.Implicits._
+import scala.util.{Failure, Try}
 
 /**
   *
   */
-object ImageFetcher {
-  val RAW_IMAGE_SIZE = 800
-
-  val DEFAULT_IMAGE_SIZE = 240
-
-  val MIN_IMAGE_SIZE = 120
-
-  val MAX_IMAGE_SIZE = 480
-
-  val playgroundUrl = "file:///proj/mogproject/mog-playground/docs/index.html" // todo: use ApplicationConf
+object ImageFetcher extends RedisCache {
 
   lazy val config: DesiredCapabilities = {
     val c = new DesiredCapabilities()
@@ -34,7 +24,7 @@ object ImageFetcher {
   /**
     * @note Creates a driver for each time because it is thread-unsafe.
     */
-  private[this] def createDriver(): Try[RemoteWebDriver] = Try(new RemoteWebDriver(new URL("http://localhost:9999"), config)).recoverWith {
+  private[this] def createDriver(): Try[RemoteWebDriver] = Try(new RemoteWebDriver(Settings.ghostDriverURL, config)).recoverWith {
     case e: Throwable => Logger.error(s"Failed to create a remote web driver: ${e}"); Failure(e)
   }
 
@@ -55,18 +45,17 @@ object ImageFetcher {
   }
 
   private[this] def convertQueryString(queryString: QueryString): QueryString =
-    queryString ++ Map("size" -> Seq(RAW_IMAGE_SIZE.toString), "action" -> Seq("image"))
+    queryString ++ Map("size" -> Seq(Settings.rawImageSize.toString), "action" -> Seq("image"))
 
   private[this] def getImageWidth(s: Option[Seq[String]]): Int = (for {
     xs <- s
     x <- xs.headOption
     n <- Try(x.toInt).toOption
-  } yield math.max(MIN_IMAGE_SIZE, math.min(n, MAX_IMAGE_SIZE))).getOrElse(DEFAULT_IMAGE_SIZE)
+  } yield math.max(Settings.minImageSize, math.min(n, Settings.maxImageSize))).getOrElse(Settings.defaultImageSize)
 
-  def get(queryString: QueryString): Try[Array[Byte]] = {
-    // todo: check cache
+  def get(queryString: QueryString): Try[Array[Byte]] = withCache(queryString.hashCode()) {
     val imageWidth = getImageWidth(queryString.get("size"))
-    val url = playgroundUrl + "?" + convertQueryString(queryString).map { case (k,v) => k + "=" + v.head}.mkString("&")
+    val url = Settings.playgroundURL + "?" + convertQueryString(queryString).map { case (k, v) => k + "=" + v.head }.mkString("&")
 
     for {
       dr <- createDriver()
@@ -78,6 +67,6 @@ object ImageFetcher {
       dr.close()
       im
     }
-    // todo: set to cache
   }
+
 }
