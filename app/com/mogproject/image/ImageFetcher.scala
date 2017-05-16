@@ -1,6 +1,5 @@
 package com.mogproject.image
 
-import java.net.URL
 import java.util.Base64
 
 import com.sksamuel.scrimage.Image
@@ -25,7 +24,7 @@ object ImageFetcher {
   /**
     * @note Creates a driver for each time because it is thread-unsafe.
     */
-  private[this] def createDriver(): Try[RemoteWebDriver] = Try(new RemoteWebDriver(Settings.ImageFetcher.ghostDriverURL, config)).recoverWith {
+  private[this] def createDriver(): Try[RemoteWebDriver] = Try(new RemoteWebDriver(Settings.ghostDriverURL, config)).recoverWith {
     case e: Throwable => Logger.error(s"Failed to create a remote web driver: ${e}"); Failure(e)
   }
 
@@ -46,18 +45,18 @@ object ImageFetcher {
   }
 
   private[this] def convertQueryString(queryString: QueryString): QueryString =
-    queryString ++ Map("size" -> Seq(Settings.ImageFetcher.rawImageSize.toString), "action" -> Seq("image"))
+    queryString ++ Map("size" -> Seq(Settings.rawImageSize.toString), "action" -> Seq("image"))
 
   private[this] def getImageWidth(s: Option[Seq[String]]): Int = (for {
     xs <- s
     x <- xs.headOption
     n <- Try(x.toInt).toOption
-  } yield math.max(Settings.ImageFetcher.minImageSize, math.min(n, Settings.ImageFetcher.maxImageSize))).getOrElse(Settings.ImageFetcher.defaultImageSize)
+  } yield math.max(Settings.minImageSize, math.min(n, Settings.maxImageSize))).getOrElse(Settings.defaultImageSize)
 
   def get(queryString: QueryString): Try[Array[Byte]] = {
     // todo: check cache
     val imageWidth = getImageWidth(queryString.get("size"))
-    val url = Settings.ImageFetcher.playgroundURL + "?" + convertQueryString(queryString).map { case (k, v) => k + "=" + v.head }.mkString("&")
+    val url = Settings.playgroundURL + "?" + convertQueryString(queryString).map { case (k, v) => k + "=" + v.head }.mkString("&")
 
     for {
       dr <- createDriver()
