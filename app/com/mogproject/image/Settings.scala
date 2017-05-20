@@ -12,7 +12,6 @@ object Settings {
   private[this] val conf: Config = ConfigFactory.load()
 
   val playgroundURL: URL = new URL(conf.getString("com.mogproject.image.playground_url"))
-  val ghostDriverURL: URL = new URL(conf.getString("com.mogproject.image.ghost_driver_url"))
   val redisURL: URL = new URL(conf.getString("com.mogproject.image.redis_url"))
 
   val rawImageSize: Int = conf.getInt("com.mogproject.image.raw_image_size")
