@@ -1,5 +1,6 @@
 package com.mogproject.image.graphic
 
+import com.mogproject.image.Arguments.{English, Japanese, Language}
 import com.mogproject.mogami.{BoardType, HandType, _}
 import com.mogproject.mogami.util.Implicits._
 import com.mogproject.image.graphic.shape._
@@ -10,12 +11,11 @@ import com.mogproject.mogami.core.game.GameStatus.Playing
   */
 case class BoardGraphic(flip: Boolean = false,
                         turn: Player = Player.BLACK,
-                        board: BoardType = State.HIRATE.board - Square(7, 7) + (Square(7, 6) -> Piece(Player.BLACK, PAWN)),
-                        hand: HandType = State.MATING_BLACK.hand.filterKeys(_.owner.isWhite) ++ State.MATING_WHITE.hand.filterKeys(_.owner.isBlack), //State.HIRATE.hand,
-                        lastMove: Seq[Square] = Seq(Square(7, 7), Square(7, 6)), // Seq.empty,
+                        board: BoardType = State.HIRATE.board,
+                        hand: HandType = State.HIRATE.hand,
+                        lastMove: Seq[Square] = Seq.empty,
                         gameStatus: GameStatus = Playing,
-                        recordLang: String = "ja",
-                        pieceLang: String = "ja"
+                        indexDisplay: Option[Language] = Some(Japanese)
                        ) extends Graphic {
   lazy val windowWidth: Int = (windowMargin + boardMargin) * 2 + pieceWidth * 11
   lazy val windowHeight: Int = boardMargin * 2 + pieceHeight * 9
@@ -46,10 +46,11 @@ case class BoardGraphic(flip: Boolean = false,
   private[this] val playerIconSize = 90
   private[this] val indicatorFontSize = 30
 
-  private[this] val fileIndex = "９８７６５４３２１"
-  private[this] val rankIndex = recordLang match {
-    case "ja" => "一二三四五六七八九"
-    case "en" => "abcdefghi"
+  private[this] lazy val fileIndex = "９８７６５４３２１"
+  private[this] lazy val rankIndex = indexDisplay match {
+    case Some(Japanese) => "一二三四五六七八九"
+    case Some(English) => "abcdefghi"
+    case _ => ""
   }
 
   protected lazy val shapes: Seq[Shape] = Seq(
@@ -57,7 +58,7 @@ case class BoardGraphic(flip: Boolean = false,
     lastMoveBackground,
     boardShapes,
     lastMoveForeground,
-    indexShapes,
+    indexDisplay.isDefined.fold(indexShapes, Seq.empty[Shape]),
     handShapes,
     boardPieces,
     handPieces,
@@ -142,8 +143,8 @@ case class BoardGraphic(flip: Boolean = false,
   // helper functions
   //
   private[this] def squareToRect(sq: Square): Rectangle = Rectangle(
-    boardRect.right - flip.fold(9 - sq.file, sq.file) * pieceWidth,
-    boardRect.top + flip.fold(10 - sq.rank, sq.rank - 1) * pieceHeight,
+    boardRect.right - flip.fold(10 - sq.file, sq.file) * pieceWidth,
+    boardRect.top + flip.fold(9 - sq.rank, sq.rank - 1) * pieceHeight,
     pieceWidth, pieceHeight)
 
   /**
