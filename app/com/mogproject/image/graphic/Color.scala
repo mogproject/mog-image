@@ -9,6 +9,10 @@ object Color {
   lazy val cursor = Color(0xE1, 0xB2, 0x65, 240)
   lazy val lastMove = Color(0xf0, 0xf0, 0xf0)
 
+
+  // promoted pieces
+  lazy val red = Color(0xd9, 0x53, 0x4f)
+
   // for indicators
   lazy val turn = Color(0x2b, 0x5f, 0x91)
   lazy val win = Color(0x5c, 0xb8, 0x5c)

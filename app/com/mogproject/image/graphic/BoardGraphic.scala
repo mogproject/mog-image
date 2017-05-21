@@ -95,7 +95,7 @@ case class BoardGraphic(flip: Boolean = false,
   }
 
   private[this] val boardPieces: Seq[Shape] = board.map { case (sq, p) =>
-    Text(p.ptype.toJapaneseSimpleName, pieceFontSize, squareToRect(sq), Text.BOLD, flip = flip ^ p.owner.isWhite)
+    Text(p.ptype.toJapaneseSimpleName, pieceFontSize, squareToRect(sq), Text.BOLD, flip = flip ^ p.owner.isWhite, foreColor = p.isPromoted.fold(Color.red, Color.BLACK))
   }.toSeq
 
   private[this] val handShapes: Seq[Shape] = Seq(
