@@ -7,7 +7,14 @@ import com.mogproject.image.graphic.Color
   */
 sealed trait Shape
 
-case class Rectangle(left: Int, top: Int, width: Int, height: Int, strokeColor: Option[Color] = Some(Color.BLACK), fillColor: Option[Color] = None) extends Shape {
+case class Rectangle(left: Int,
+                     top: Int,
+                     width: Int,
+                     height: Int,
+                     strokeColor: Option[Color] = Some(Color.BLACK),
+                     fillColor: Option[Color] = None,
+                     stroke: Int = 1,
+                     strokeGradation: Option[Color] = None) extends Shape {
   val right: Int = left + width
   val bottom: Int = top + height
 }
@@ -22,8 +29,14 @@ case class Circle(x: Int, y: Int, r: Int, strokeColor: Option[Color] = Some(Colo
 }
 
 case class Text(text: String,
-                font: String,
                 fontSize: Int,
                 boundary: Rectangle,
+                style: Int = Text.PLAIN,
+                font: Option[String] = None,
                 foreColor: Color = Color.BLACK,
                 flip: Boolean = false) extends Shape
+
+object Text {
+  val PLAIN = 0
+  val BOLD = 1
+}
