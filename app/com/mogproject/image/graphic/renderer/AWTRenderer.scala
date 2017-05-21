@@ -64,13 +64,19 @@ object AWTRenderer extends Renderer[Graphics2D] {
       if (!graphicsEnv.getAvailableFontFamilyNames.contains(ft)) {
         Logger.warn(s"Font is not installed: ${t.font}")
       }
-      new Font(ft, t.style, t.fontSize)
-    }.getOrElse(defaultFont.deriveFont(t.style, t.fontSize))
+      new Font(ft, t.style & 255, t.fontSize)
+    }.getOrElse(defaultFont.deriveFont(t.style & 255, t.fontSize))
 
     val metrics: FontMetrics = g.getFontMetrics(font)
 
     // Determine the coordinate for the text
-    val x = t.boundary.left + (t.boundary.width - metrics.stringWidth(t.text)) / 2
+    val x = if ((t.style & Text.ALIGN_LEFT) != 0) {
+      t.boundary.left
+    } else if ((t.style & Text.ALIGN_RIGHT) != 0) {
+      t.boundary.right - metrics.stringWidth(t.text)
+    } else {
+      t.boundary.left + (t.boundary.width - metrics.stringWidth(t.text)) / 2
+    }
     val y = t.boundary.top + (t.boundary.height - metrics.getHeight) / 2 + metrics.getAscent
 
     // Draw the String

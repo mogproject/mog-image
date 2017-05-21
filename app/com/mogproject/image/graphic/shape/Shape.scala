@@ -31,7 +31,7 @@ case class Circle(x: Int, y: Int, r: Int, strokeColor: Option[Color] = Some(Colo
 case class Text(text: String,
                 fontSize: Int,
                 boundary: Rectangle,
-                style: Int = Text.PLAIN,
+                style: Int = Text.PLAIN | Text.ALIGN_CENTER,
                 font: Option[String] = None,
                 foreColor: Color = Color.BLACK,
                 flip: Boolean = false) extends Shape
@@ -39,4 +39,8 @@ case class Text(text: String,
 object Text {
   val PLAIN = 0
   val BOLD = 1
+
+  val ALIGN_CENTER = 0
+  val ALIGN_LEFT = 256
+  val ALIGN_RIGHT = 512
 }

@@ -111,7 +111,7 @@ case class BoardGraphic(flip: Boolean = false,
     val baseRect = Rectangle(
       boardRect.right + boardMargin + pieceWidth - handNumberWidth,
       boardRect.top + pieceHeight * (2 + pt.sortId) - handNumberHeight, handNumberWidth, handNumberHeight)
-    Text(f"${n}%2d", handNumberSize, isWhiteSide.when(rotateRect)(baseRect), Text.PLAIN, flip = isWhiteSide, font = Some("Monospaced"))
+    Text(n.toString, handNumberSize, isWhiteSide.when(rotateRect)(baseRect), Text.PLAIN | Text.ALIGN_RIGHT, flip = isWhiteSide, font = Some("SansSerif"))
   }
 
   private[this] val indicatorShapes: Seq[Shape] = {
