@@ -155,7 +155,7 @@ case class BoardGraphic(flip: Boolean = false,
   )
 
   private[this] def getIndicatorParams: Map[Player, (String, Color)] = gameStatus match {
-    case GameStatus.Playing => Map(turn -> ("千日手", Color.turn))
+    case GameStatus.Playing => Map(turn -> ("TURN", Color.turn))
     case GameStatus.Mated | GameStatus.Resigned | GameStatus.TimedUp | GameStatus.IllegallyMoved => Map(turn -> ("LOSE", Color.lose), !turn -> ("WIN", Color.win))
     case GameStatus.PerpetualCheck | GameStatus.Uchifuzume => Map(!turn -> ("LOSE", Color.lose), turn -> ("WIN", Color.win))
     case GameStatus.Drawn => Map(Player.BLACK -> ("DRAW", Color.draw), Player.WHITE -> ("DRAW", Color.draw))
