@@ -44,3 +44,5 @@ object Text {
   val ALIGN_LEFT = 256
   val ALIGN_RIGHT = 512
 }
+
+case class Image(data: Array[Byte], boundary: Rectangle, flip: Boolean = false) extends Shape

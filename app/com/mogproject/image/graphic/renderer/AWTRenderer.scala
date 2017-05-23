@@ -1,6 +1,8 @@
 package com.mogproject.image.graphic.renderer
 
 import java.awt.{Font, FontMetrics, Graphics2D, GraphicsEnvironment, Color => AWTColor}
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
 
 import com.mogproject.image.graphic.Color
 import com.mogproject.image.graphic.shape._
@@ -39,19 +41,27 @@ object AWTRenderer extends Renderer[Graphics2D] {
         circle.strokeColor.foreach(withColor(_)(g)(_.drawOval(circle.left, circle.top, circle.width, circle.height)))
         circle.fillColor.foreach(withColor(_)(g)(_.fillOval(circle.left, circle.top, circle.width, circle.height)))
       case t: Text =>
-        renderFlippedText(t.flip)(t, g)
+        withRotate(g, t.flip, t.boundary) { (gg, newBoundary) =>
+          renderText(t.copy(boundary = newBoundary), gg)
+        }
+      case im: Image =>
+        withRotate(g, im.flip, im.boundary) { (gg, newBoundary) =>
+          val img = ImageIO.read(new ByteArrayInputStream(im.data))
+          gg.drawImage(img, newBoundary.left, newBoundary.top, newBoundary.width, newBoundary.height, null)
+        }
     }
     g
   }
 
-  private[this] def renderFlippedText(flip: Boolean)(t: Text, g: Graphics2D) = if (flip) {
+  private[this] def withRotate(g: Graphics2D, flip: Boolean, boundary: Rectangle)(f: (Graphics2D, Rectangle) => Unit): Unit = if (flip) {
     val orig = g.getTransform
     g.rotate(Math.PI)
-    val x = -t.boundary.left - t.boundary.width - 1
-    val y = -t.boundary.top - t.boundary.height - 1
-    renderText(t.copy(boundary = t.boundary.copy(left = x, top = y)), g)
+    val x = -boundary.left - boundary.width - 1
+    val y = -boundary.top - boundary.height - 1
+    f(g, boundary.copy(left = x, top = y))
     g.setTransform(orig)
-  } else renderText(t, g)
+  } else f(g, boundary)
+
 
   private[this] lazy val defaultFont = Font.createFont(Font.TRUETYPE_FONT, this.getClass.getResourceAsStream("/fonts/ipaexm.ttf"))
 

@@ -1,5 +1,7 @@
 package com.mogproject.image
 
+import java.net.URLDecoder
+
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.move.{MoveBuilderSfenBoard, MoveBuilderSfenHand}
 import play.api.Logger
@@ -12,7 +14,12 @@ case class Arguments(state: State = State.HIRATE,
                      lastMove: Seq[Square] = Seq.empty,
                      gameStatus: GameStatus = GameStatus.Playing,
                      flip: Boolean = false,
-                     indexDisplay: Option[Arguments.Language] = Some(Arguments.Japanese)) {
+                     indexDisplay: Option[Arguments.Language] = Some(Arguments.Japanese),
+                     blackName: String = "Black",
+                     whiteName: String = "White",
+                     blackPicURL: Option[String] = None,
+                     whitePicURL: Option[String] = None
+                    ) {
 
   def parseQueryString(q: QueryString): Arguments = this
     .parseState(q)
@@ -21,8 +28,12 @@ case class Arguments(state: State = State.HIRATE,
     .parseGameStatus(q)
     .parseFlip(q)
     .parseIndexDisplay(q)
+    .parsePlayerNames(q)
+    .parsePicURLs(q)
 
   private[this] def getFirstValue(q: QueryString, key: String): Option[String] = q.get(key).flatMap(_.headOption)
+
+  private[this] def decodeString(s: String): String = URLDecoder.decode(s, "UTF8")
 
   protected[image] def parseState(q: QueryString): Arguments = {
     getFirstValue(q, "u").flatMap(s => Try(State.parseUsenString(s)) match {
@@ -87,6 +98,16 @@ case class Arguments(state: State = State.HIRATE,
       this
     case _ => this
   }
+
+  protected[image] def parsePlayerNames(q: QueryString): Arguments = this.copy(
+    blackName = getFirstValue(q, "bn").map(decodeString).getOrElse("Black"), // todo default -> Settings or lang?
+    whiteName = getFirstValue(q, "wn").map(decodeString).getOrElse("White")
+  )
+
+  protected[image] def parsePicURLs(q: QueryString): Arguments = this.copy(
+    blackPicURL = getFirstValue(q, "bp").map(decodeString),
+    whitePicURL = getFirstValue(q, "wp").map(decodeString)
+  )
 }
 
 object Arguments {
