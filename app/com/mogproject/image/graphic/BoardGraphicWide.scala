@@ -21,7 +21,7 @@ case class BoardGraphicWide(flip: Boolean = false,
                             blackPic: Option[Array[Byte]],
                             whitePic: Option[Array[Byte]]
                            ) extends BoardGraphic {
-  lazy val windowWidth: Int = (windowMargin + boardMargin) * 2 + pieceWidth * 13
+  lazy val windowWidth: Int = (windowMargin + boardMargin + indicatorMargin) * 2 + pieceWidth * 13
   lazy val windowHeight: Int = boardMargin * 2 + pieceHeight * 9
 
   private[this] val pieceWidth = 86
@@ -34,13 +34,13 @@ case class BoardGraphicWide(flip: Boolean = false,
   private[this] val handNumberHeight = 45
 
   private[this] val boardMargin = 40
-  private[this] val windowMargin = 28
+  private[this] val windowMargin = 20
+  private[this] val indicatorMargin = 8
 
   private[this] val dotSize = 4
 
   private[this] val playerIconHeight = 168
   private[this] val indicatorHeight = 40
-  private[this] val indicatorBarWidth = 8
 
   // font sizes
   private[this] val pieceFontSize = 80
@@ -80,7 +80,7 @@ case class BoardGraphicWide(flip: Boolean = false,
   private[this] lazy val lastMoveForeground: Seq[Shape] =
     lastMove.lastOption.toSeq.map(squareToRect(_).copy(strokeColor = Some(Color.cursor), stroke = 10, strokeGradation = Some(Color.cursor.copy(a = 20))))
 
-  private[this] val boardRect = Rectangle(windowMargin + pieceWidth * 2 + boardMargin + indicatorBarWidth, boardMargin, pieceWidth * 9, pieceHeight * 9, stroke = 3)
+  private[this] val boardRect = Rectangle(windowMargin + pieceWidth * 2 + boardMargin + indicatorMargin, boardMargin, pieceWidth * 9, pieceHeight * 9, stroke = 3)
 
   private[this] val background: Seq[Shape] = Seq(Rectangle(0, 0, windowWidth, windowHeight, None, Some(Color.WHITE)))
 
@@ -105,33 +105,33 @@ case class BoardGraphicWide(flip: Boolean = false,
   }.toSeq
 
   private[this] val handShapes: Seq[Shape] = Seq(
-    Rectangle(boardRect.right + boardMargin + indicatorBarWidth, boardRect.top + pieceHeight * 5, pieceWidth * 2, pieceHeight * 4, stroke = 3),
+    Rectangle(boardRect.right + boardMargin + indicatorMargin, boardRect.top + pieceHeight * 5, pieceWidth * 2, pieceHeight * 4, stroke = 3),
     Rectangle(windowMargin, boardMargin, pieceWidth * 2, pieceHeight * 4, stroke = 3)
   )
 
   private[this] val handPieces: Seq[Shape] = hand.filter(_._2 > 0).keys.toSeq.map { case Hand(pl, pt) =>
     val isWhiteSide = pl.isWhite ^ flip
     val base = Rectangle(
-      boardRect.right + boardMargin + (pt.sortId % 2) * pieceWidth,
-      boardRect.top + pieceHeight * (5 + pt.sortId / 2),
+      boardRect.right + boardMargin + ((pt.sortId - 1) % 2) * pieceWidth + indicatorMargin,
+      boardRect.top + pieceHeight * (5 + (pt.sortId - 1) / 2),
       handPieceWidth, handPieceHeight)
     Text(pt.toJapaneseSimpleName, handFontSize, isWhiteSide.when(rotateRect)(base), Text.BOLD, flip = isWhiteSide)
   } ++ hand.filter(_._2 > 1).toSeq.map { case (Hand(pl, pt), n) =>
     val isWhiteSide = pl.isWhite ^ flip
     val base = Rectangle(
-      boardRect.right + boardMargin + pieceWidth - handNumberWidth,
-      boardRect.top + pieceHeight * (2 + pt.sortId) - handNumberHeight, handNumberWidth, handNumberHeight)
+      boardRect.right + boardMargin + pieceWidth - handNumberWidth + ((pt.sortId - 1) % 2) * pieceWidth + indicatorMargin,
+      boardRect.top + pieceHeight * (6 + (pt.sortId - 1) / 2) - handNumberHeight, handNumberWidth, handNumberHeight)
     Text(n.toString, handNumberSize, isWhiteSide.when(rotateRect)(base), Text.PLAIN | Text.ALIGN_RIGHT, flip = isWhiteSide, font = Some("SansSerif"))
   }
 
   private[this] val indicatorShapes: Seq[Shape] = {
     val base = Rectangle(
-      boardRect.right + boardMargin - 2 + indicatorBarWidth,
+      boardRect.right + boardMargin - 2 + indicatorMargin,
       boardRect.top + pieceHeight * 5 - pieceWidth * 2 - 7 - indicatorHeight,
-      pieceWidth * 2 + indicatorBarWidth + 5, indicatorHeight
+      pieceWidth * 2 + indicatorMargin + 5, indicatorHeight
     )
     val bar = Rectangle(
-      base.right - indicatorBarWidth, base.top, indicatorBarWidth, boardRect.bottom - base.top + 3
+      base.right - indicatorMargin, base.top, indicatorMargin, boardRect.bottom - base.top + 3
     )
 
     getIndicatorParams.toSeq.flatMap { case (pl, (s, c)) =>
@@ -142,7 +142,7 @@ case class BoardGraphicWide(flip: Boolean = false,
   }
 
   private[this] val playerIconShapes: Seq[Shape] = {
-    val base = Rectangle(boardRect.right + boardMargin + indicatorBarWidth, boardRect.top + pieceHeight / 2, pieceWidth * 2, playerIconHeight)
+    val base = Rectangle(boardRect.right + boardMargin + indicatorMargin, boardRect.top + pieceHeight / 2, pieceWidth * 2, playerIconHeight)
     Seq(
       Text(Player.BLACK.toSymbolString(), playerIconSize, flip.when(rotateRect)(base), flip = flip),
       Text(Player.WHITE.toSymbolString(), playerIconSize, (!flip).when(rotateRect)(base), flip = !flip)
@@ -151,7 +151,7 @@ case class BoardGraphicWide(flip: Boolean = false,
 
   private[this] val playerImages: Seq[Shape] = {
     val base = Rectangle(
-      boardRect.right + boardMargin - 2 + indicatorBarWidth,
+      boardRect.right + boardMargin - 2 + indicatorMargin,
       boardRect.top + pieceHeight * 5 - pieceWidth * 2 - 7,
       pieceWidth * 2 + 5,
       pieceWidth * 2 + 5)
@@ -164,7 +164,7 @@ case class BoardGraphicWide(flip: Boolean = false,
 
   private[this] val playerNames: Seq[Shape] = {
     val base = Rectangle(
-      boardRect.right + boardMargin + indicatorBarWidth - 2,
+      boardRect.right + boardMargin + indicatorMargin - 2,
       boardRect.top + pieceHeight * 2,
       pieceWidth * 2 + 5,
       indicatorHeight
