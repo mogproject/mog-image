@@ -10,7 +10,6 @@ import com.mogproject.image.graphic.renderer.AWTRenderer
 import com.redis.serialization.Parse.Implicits._
 import com.sksamuel.scrimage.{Image, ScaleMethod}
 import play.api.Logger
-import play.api.routing.sird.QueryString
 
 import scala.util.{Failure, Success, Try}
 
@@ -18,6 +17,10 @@ import scala.util.{Failure, Success, Try}
   * main object
   */
 object ImageGenerator extends RedisCache {
+
+  override def redisDB: Int = 0
+
+  override def redisTTL: Long = 60L * 60 * 24 * 7 // a week
 
   private[this] def generateImage(boardGraphic: BoardGraphic): BufferedImage = {
     val buff = new BufferedImage(boardGraphic.windowWidth, boardGraphic.windowHeight, BufferedImage.TYPE_INT_RGB)
@@ -41,6 +44,7 @@ object ImageGenerator extends RedisCache {
     buff
   }
 
+  // todo: move to another class
   private[this] def scaleImage(image: Array[Byte], width: Int): Try[Array[Byte]] = Try(Image(image).scaleToWidth(width, ScaleMethod.Bicubic).bytes).recoverWith {
     case e: Throwable => Logger.error(s"Failed to scale an image: ${e}"); Failure(e)
   }
@@ -51,11 +55,9 @@ object ImageGenerator extends RedisCache {
     baos.toByteArray
   }
 
-  def get(queryString: QueryString): Try[Array[Byte]] = withCache(queryString.hashCode()) {
-    val args = Arguments().parseQueryString(queryString)
-    val brd = BoardGraphic(args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay)
-    val bs = convertImageToByteArray(generateImage(brd))
-    scaleImage(bs, args.size)
+  def generate(board: BoardGraphic, hashCode: Int, size: Int): Try[Array[Byte]] = withCache(hashCode) {
+    val bs = convertImageToByteArray(generateImage(board))
+    scaleImage(bs, size)
   }
 
 }

@@ -11,6 +11,7 @@ scalaVersion := "2.11.11"
 
 libraryDependencies += filters
 libraryDependencies ++= Seq(
+  ws.exclude("commons-logging", "commons-logging"),
   "com.typesafe" % "config" % "1.3.1",
   "net.debasishg" %% "redisclient" % "3.4",
   "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.7",
