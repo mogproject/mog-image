@@ -27,8 +27,7 @@ case class BoardGraphicCompact(flip: Boolean = false,
   override protected lazy val handColumns: Int = 1
 
   override protected lazy val indicatorBlackTop: Int = handBlackTop - indicatorHeight - 2
-
-  override protected def symbolBlackTop: Int = boardRect.top + pieceHeight * 2 - symbolHeight
+  override protected lazy val symbolBlackTop: Int = boardRect.top + pieceHeight * 2 - symbolHeight
 
   protected lazy val shapes: Seq[Shape] = Seq(
     background,

@@ -103,7 +103,7 @@ trait BoardGraphic extends Graphic {
 
   protected val indexShapes: Seq[Shape] = if (indexDisplay.isDefined) {
     flip.when[String](_.reverse)(fileIndex).zipWithIndex.map { case (c, i) =>
-      Text(c.toString, indexFontSize, Rectangle(boardRect.left + i * pieceWidth, 0, pieceWidth, boardMargin))
+      Text(c.toString, indexFontSize, Rectangle(boardRect.left + i * pieceWidth, boardTop - boardMargin, pieceWidth, boardMargin))
     } ++ flip.when[String](_.reverse)(rankIndex).zipWithIndex.map { case (c, i) =>
       Text(c.toString, indexFontSize, Rectangle(boardRect.right, boardRect.top + i * pieceHeight, boardMargin, pieceHeight))
     }
