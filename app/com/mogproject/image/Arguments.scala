@@ -2,6 +2,7 @@ package com.mogproject.image
 
 import java.net.URLDecoder
 
+import com.mogproject.image.Arguments.GraphicLayout
 import com.mogproject.mogami._
 import com.mogproject.mogami.core.move.{MoveBuilderSfenBoard, MoveBuilderSfenHand}
 import play.api.Logger
@@ -18,7 +19,8 @@ case class Arguments(state: State = State.HIRATE,
                      blackName: String = "Black",
                      whiteName: String = "White",
                      blackPicURL: Option[String] = None,
-                     whitePicURL: Option[String] = None
+                     whitePicURL: Option[String] = None,
+                     layout: GraphicLayout.GraphicLayout = GraphicLayout.Square
                     ) {
 
   def parseQueryString(q: QueryString): Arguments = this
@@ -30,6 +32,7 @@ case class Arguments(state: State = State.HIRATE,
     .parseIndexDisplay(q)
     .parsePlayerNames(q)
     .parsePicURLs(q)
+    .parseGraphicLayout(q)
 
   private[this] def getFirstValue(q: QueryString, key: String): Option[String] = q.get(key).flatMap(_.headOption)
 
@@ -108,6 +111,16 @@ case class Arguments(state: State = State.HIRATE,
     blackPicURL = getFirstValue(q, "bp").map(decodeString),
     whitePicURL = getFirstValue(q, "wp").map(decodeString)
   )
+
+  protected[image] def parseGraphicLayout(q: QueryString): Arguments = getFirstValue(q, "layout") match {
+    case Some("compact") => this.copy(layout = GraphicLayout.Compact)
+    case Some("wide") => this.copy(layout = GraphicLayout.Wide)
+    case Some("square") => this.copy(layout = GraphicLayout.Square)
+    case Some(s) =>
+      Logger.debug(s"Invalid parameter: layout=${s}")
+      this
+    case _ => this
+  }
 }
 
 object Arguments {
@@ -117,5 +130,17 @@ object Arguments {
   case object Japanese extends Language
 
   case object English extends Language
+
+  object GraphicLayout {
+
+    sealed trait GraphicLayout
+
+    case object Compact extends GraphicLayout
+
+    case object Wide extends GraphicLayout
+
+    case object Square extends GraphicLayout
+
+  }
 
 }
