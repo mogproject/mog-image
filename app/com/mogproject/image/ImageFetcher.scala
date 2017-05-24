@@ -4,6 +4,7 @@ import play.api.libs.ws.WSClient
 
 import scala.concurrent.Future
 import com.redis.serialization.Parse.Implicits._
+import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 /**
@@ -34,7 +35,8 @@ object ImageFetcher extends RedisCache {
           response.bodyAsBytes.toByteBuffer.array()
         }
     } else {
-      throw new ImageFetchError("ImageFetcher is disabled.")
+      Logger.debug(s"Fetcher is disabled. Returning the default image: ${url}")
+      Future(Settings.defaultProfileImage)
     }
   }
 

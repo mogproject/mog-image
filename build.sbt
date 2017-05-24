@@ -18,7 +18,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test
 )
 
-addCommandAlias("run", """;+compile;set javaOptions += "-Dlogger.resource=/logback-dev.xml"; root/run""")
+addCommandAlias("run", """;+compile;set javaOptions ++= Seq("-Dconfig.resource=/application-dev.conf", "-Dlogger.resource=/logback-dev.xml"); root/run""")
 
 import AssemblyKeys._
 
