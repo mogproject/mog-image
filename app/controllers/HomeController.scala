@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.mogproject.image.graphic.{BoardGraphicCompact, BoardGraphicWide}
-import com.mogproject.image.{Arguments, ImageFetcher, ImageGenerator}
+import com.mogproject.image.{Arguments, ImageFetcher, ImageGenerator, Settings}
 import play.api.Logger
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -18,10 +18,10 @@ class HomeController @Inject()(ws: WSClient) extends Controller {
 
     val result = for {
       (bp, wp) <- ImageFetcher.fetch(args)(ws)
-      brd = if (bp.isDefined || wp.isDefined)
-        BoardGraphicWide(args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay, args.blackName, args.whiteName, bp, wp)
-      else
-        BoardGraphicCompact(args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay)
+      brd = BoardGraphicWide(
+        args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay,
+        args.blackName, args.whiteName, bp.getOrElse(Settings.defaultProfileImage), wp.getOrElse(Settings.defaultProfileImage)
+      )
       bytes <- Future.fromTry(ImageGenerator.generate(brd, args.hashCode(), args.size))
     } yield {
       Logger.debug(s"Success: args=${args}")

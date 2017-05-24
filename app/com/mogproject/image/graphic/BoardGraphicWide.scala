@@ -18,8 +18,8 @@ case class BoardGraphicWide(flip: Boolean = false,
                             indexDisplay: Option[Language] = Some(Japanese),
                             blackName: String,
                             whiteName: String,
-                            blackPic: Option[Array[Byte]],
-                            whitePic: Option[Array[Byte]]
+                            blackPic: Array[Byte],
+                            whitePic: Array[Byte]
                            ) extends BoardGraphic {
   lazy val windowWidth: Int = (windowMargin + boardMargin + indicatorMargin) * 2 + pieceWidth * 13
   lazy val windowHeight: Int = boardMargin * 2 + pieceHeight * 9
@@ -155,10 +155,9 @@ case class BoardGraphicWide(flip: Boolean = false,
       boardRect.top + pieceHeight * 5 - pieceWidth * 2 - 7,
       pieceWidth * 2 + 5,
       pieceWidth * 2 + 5)
-    blackPic.map(data =>
-      Image(data, flip.when(rotateRect)(base), flip)
-    ).toSeq ++ whitePic.map(data =>
-      Image(data, (!flip).when(rotateRect)(base), !flip)
+    Seq(
+      Image(blackPic, flip.when(rotateRect)(base), flip),
+      Image(whitePic, (!flip).when(rotateRect)(base), !flip)
     )
   }
 
