@@ -67,13 +67,13 @@ case class BoardGraphicSquare(flip: Boolean = false,
   private[this] val playerNames: Seq[Shape] = {
     val base = Rectangle(
       0,
-      boardRect.top - indicatorHeight * 2,
+      boardRect.top - indicatorHeight * 3,
       windowWidth - windowMargin,
-      indicatorHeight
+      indicatorHeight * 2
     )
     Seq(
-      Text(blackName, indicatorFontSize, flip.when(rotateRect)(base), Text.BOLD | flip.fold(Text.ALIGN_LEFT, Text.ALIGN_RIGHT)),
-      Text(whiteName, indicatorFontSize, (!flip).when(rotateRect)(base), Text.BOLD | flip.fold(Text.ALIGN_RIGHT, Text.ALIGN_LEFT))
+      Text(blackName, indicatorFontSize * 2, flip.when(rotateRect)(base), Text.PLAIN | flip.fold(Text.ALIGN_LEFT, Text.ALIGN_RIGHT)),
+      Text(whiteName, indicatorFontSize * 2, (!flip).when(rotateRect)(base), Text.PLAIN | flip.fold(Text.ALIGN_RIGHT, Text.ALIGN_LEFT))
     )
   }
 
