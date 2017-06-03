@@ -46,4 +46,14 @@ class HomeController @Inject()(ws: WSClient) extends Controller {
       InternalServerError("Internal Server Error")
     }
   }
+
+  def shutdown = Action { implicit request =>
+    Future {
+      Thread.sleep(2000)
+      Logger.info("Shutting down.")
+      ws.close()
+      System.exit(0)
+    }
+    Ok
+  }
 }
