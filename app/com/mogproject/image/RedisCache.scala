@@ -16,7 +16,8 @@ trait RedisCache {
 
   def redisTTL: Long
 
-  private[this] lazy val redisClient = Try(new RedisClient(Settings.redisURL.toURI.getHost, Settings.redisURL.toURI.getPort, redisDB))
+  /** @see https://github.com/debasishg/scala-redis/issues/109 */
+  private[this] def redisClient = Try(new RedisClient(Settings.redisURL.toURI.getHost, Settings.redisURL.toURI.getPort, redisDB))
 
   def withCache[K, V](key: K)(func: => Try[V])(implicit parse: Parse[V]): Try[V] = redisClient match {
     case Success(cl) =>
