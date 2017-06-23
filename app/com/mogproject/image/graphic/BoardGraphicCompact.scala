@@ -14,7 +14,8 @@ case class BoardGraphicCompact(flip: Boolean = false,
                                hand: HandType = State.HIRATE.hand,
                                lastMove: Seq[Square] = Seq.empty,
                                gameStatus: GameStatus = Playing,
-                               indexDisplay: Option[Language] = Some(Japanese)
+                               indexDisplay: Option[Language] = Some(Japanese),
+                               pieceLang: Language = Japanese
                               ) extends BoardGraphic {
   override val windowWidth: Int = (windowMargin + boardMargin + indicatorMargin) * 2 + pieceWidth * 11
   override val windowHeight: Int = boardMargin * 2 + pieceHeight * 9

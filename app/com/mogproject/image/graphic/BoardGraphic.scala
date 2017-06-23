@@ -24,6 +24,8 @@ trait BoardGraphic extends Graphic {
 
   def indexDisplay: Option[Language]
 
+  def pieceLang: Language
+
   // layouts
   def windowWidth: Int
 
@@ -64,9 +66,13 @@ trait BoardGraphic extends Graphic {
   protected val indicatorHeight = 40
 
   // font sizes
-  protected val pieceFontSize = 80
+  protected val pieceFontSizeJapanese = 80
+  protected val pieceFontSizeEnglishBorder = 98
+  protected val pieceFontSizeEnglish = 70
+  protected val handFontSizeJapanese = 60
+  protected val handFontSizeEnglishBorder = 70
+  protected val handFontSizeEnglish = 50
   protected val indexFontSize = 30
-  protected val handFontSize = 60
   protected val handNumberSize = 40
   protected val playerIconSize = 90
   protected val indicatorFontSize = 30
@@ -109,9 +115,31 @@ trait BoardGraphic extends Graphic {
     }
   } else Seq.empty
 
-  protected val boardPieces: Seq[Shape] = board.map { case (sq, p) =>
-    Text(p.ptype.toJapaneseSimpleName, pieceFontSize, squareToRect(sq), Text.BOLD, flip = flip ^ p.owner.isWhite, foreColor = p.isPromoted.fold(Color.red, Color.BLACK))
-  }.toSeq
+  protected def createPieceText(rect: Rectangle, piece: Piece, isSmall: Boolean): Seq[Text] = {
+    val fl = flip ^ piece.owner.isWhite
+
+    pieceLang match {
+      case Japanese =>
+        Seq(Text(
+          piece.ptype.toJapaneseSimpleName, isSmall.fold(handFontSizeJapanese, pieceFontSizeJapanese),
+          rect, Text.BOLD, flip = fl, foreColor = piece.isPromoted.fold(Color.red, Color.BLACK)
+        ))
+      case English =>
+        def f(r: Rectangle, percent: Int) = rect.copy(top = rect.top + fl.fold(-1, 1) * rect.height * percent / 100) // adjust the position
+        Seq(
+          Text(
+            Player.WHITE.toSymbolString(), isSmall.fold(handFontSizeEnglishBorder, pieceFontSizeEnglishBorder),
+            f(rect, 3), Text.PLAIN, flip = fl, foreColor = Color.BLACK
+          ),
+          Text(
+            piece.ptype.demoted.toEnglishSimpleName, isSmall.fold(handFontSizeEnglish, pieceFontSizeEnglish),
+            f(rect, 13), Text.PLAIN, flip = fl, foreColor = piece.isPromoted.fold(Color.red, Color.BLACK), font = Some("Serif")
+          )
+        )
+    }
+  }
+
+  protected val boardPieces: Seq[Shape] = board.flatMap { case (sq, p) => createPieceText(squareToRect(sq), p, isSmall = false) }.toSeq
 
   //
   // hand elements
@@ -132,8 +160,8 @@ trait BoardGraphic extends Graphic {
       handPieceHeight
     )
     (n > 0).option(
-      Text(ptype.toJapaneseSimpleName, handFontSize, isWhiteSide.when(rotateRect)(base), Text.BOLD, flip = isWhiteSide)
-    ).toSeq ++ (n > 1).option {
+      createPieceText(isWhiteSide.when(rotateRect)(base), Piece(player, ptype), isSmall = true)
+    ).toSeq.flatten ++ (n > 1).option {
       val numberRect = Rectangle(base.left + pieceWidth - handNumberWidth, base.top + pieceHeight - handNumberHeight, handNumberWidth, handNumberHeight)
       Text(n.toString, handNumberSize, isWhiteSide.when(rotateRect)(numberRect), Text.PLAIN | Text.ALIGN_RIGHT, flip = isWhiteSide, font = Some("SansSerif"))
     }

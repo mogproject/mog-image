@@ -16,6 +16,7 @@ case class Arguments(state: State = State.HIRATE,
                      gameStatus: GameStatus = GameStatus.Playing,
                      flip: Boolean = false,
                      indexDisplay: Option[Arguments.Language] = Some(Arguments.Japanese),
+                     pieceLang: Arguments.Language = Arguments.Japanese,
                      blackName: String = "Black",
                      whiteName: String = "White",
                      blackPicURL: Option[String] = None,
@@ -30,6 +31,7 @@ case class Arguments(state: State = State.HIRATE,
     .parseGameStatus(q)
     .parseFlip(q)
     .parseIndexDisplay(q)
+    .parsePieceLang(q)
     .parsePlayerNames(q)
     .parsePicURLs(q)
     .parseGraphicLayout(q)
@@ -99,6 +101,12 @@ case class Arguments(state: State = State.HIRATE,
     case Some(s) =>
       Logger.debug(s"Invalid parameter: index=${s}")
       this
+    case _ => this
+  }
+
+  protected[image] def parsePieceLang(q: QueryString): Arguments = getFirstValue(q, "plang") match {
+    case Some("ja") => this.copy(pieceLang = Arguments.Japanese)
+    case Some("en") => this.copy(pieceLang = Arguments.English)
     case _ => this
   }
 

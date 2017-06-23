@@ -22,17 +22,17 @@ class HomeController @Inject()(ws: WSClient) extends Controller {
       brd = args.layout match {
         case GraphicLayout.Square =>
           BoardGraphicSquare(
-            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay,
+            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay, args.pieceLang,
             args.blackName, args.whiteName, bp.getOrElse(Settings.defaultProfileImage), wp.getOrElse(Settings.defaultProfileImage)
           )
         case GraphicLayout.Wide =>
           BoardGraphicWide(
-            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay,
+            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay, args.pieceLang,
             args.blackName, args.whiteName, bp.getOrElse(Settings.defaultProfileImage), wp.getOrElse(Settings.defaultProfileImage)
           )
         case GraphicLayout.Compact =>
           BoardGraphicCompact(
-            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay
+            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay, args.pieceLang
           )
       }
       bytes <- Future.fromTry(ImageGenerator.generate(brd, args.hashCode(), args.size))
