@@ -133,7 +133,7 @@ trait BoardGraphic extends Graphic {
           ),
           Text(
             piece.ptype.demoted.toEnglishSimpleName, isSmall.fold(handFontSizeEnglish, pieceFontSizeEnglish),
-            f(rect, 13), Text.PLAIN, flip = fl, foreColor = piece.isPromoted.fold(Color.red, Color.BLACK), font = Some("Serif")
+            f(rect, 11), Text.PLAIN, flip = fl, foreColor = piece.isPromoted.fold(Color.red, Color.BLACK), font = Some("Serif")
           )
         )
     }
