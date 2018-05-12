@@ -124,6 +124,7 @@ case class Arguments(state: State = State.HIRATE,
     case Some("compact") => this.copy(layout = GraphicLayout.Compact)
     case Some("wide") => this.copy(layout = GraphicLayout.Wide)
     case Some("square") => this.copy(layout = GraphicLayout.Square)
+    case Some("padded") => this.copy(layout = GraphicLayout.Padded)
     case Some(s) =>
       Logger.debug(s"Invalid parameter: layout=${s}")
       this
@@ -148,6 +149,8 @@ object Arguments {
     case object Wide extends GraphicLayout
 
     case object Square extends GraphicLayout
+
+    case object Padded extends GraphicLayout // for Facebook's 1.91x1 layout
 
   }
 

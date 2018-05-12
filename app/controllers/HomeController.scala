@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.mogproject.image.Arguments.GraphicLayout
-import com.mogproject.image.graphic.{BoardGraphicCompact, BoardGraphicSquare, BoardGraphicWide}
+import com.mogproject.image.graphic.{BoardGraphicCompact, BoardGraphicPadded, BoardGraphicSquare, BoardGraphicWide}
 import com.mogproject.image.{Arguments, ImageFetcher, ImageGenerator, Settings}
 import play.api.Logger
 import play.api.libs.ws.WSClient
@@ -22,6 +22,11 @@ class HomeController @Inject()(ws: WSClient) extends Controller {
       brd = args.layout match {
         case GraphicLayout.Square =>
           BoardGraphicSquare(
+            args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay, args.pieceLang,
+            args.blackName, args.whiteName, bp.getOrElse(Settings.defaultProfileImage), wp.getOrElse(Settings.defaultProfileImage)
+          )
+        case GraphicLayout.Padded =>
+          BoardGraphicPadded(
             args.flip, args.state.turn, args.state.board, args.state.hand, args.lastMove, args.gameStatus, args.indexDisplay, args.pieceLang,
             args.blackName, args.whiteName, bp.getOrElse(Settings.defaultProfileImage), wp.getOrElse(Settings.defaultProfileImage)
           )

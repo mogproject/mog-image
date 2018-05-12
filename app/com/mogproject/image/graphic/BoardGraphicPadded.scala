@@ -7,7 +7,7 @@ import com.mogproject.mogami.{BoardType, HandType, _}
 /**
   * Abstract board drawing
   */
-case class BoardGraphicSquare(flip: Boolean = false,
+case class BoardGraphicPadded(flip: Boolean = false,
                               turn: Player = Player.BLACK,
                               board: BoardType = State.HIRATE.board,
                               hand: HandType = State.HIRATE.hand,
@@ -20,5 +20,5 @@ case class BoardGraphicSquare(flip: Boolean = false,
                               blackPic: Array[Byte],
                               whitePic: Array[Byte]
                              ) extends BoardGraphicSquareLike {
-
+  override lazy val windowWidth: Int = areaWidth * 40 / 21
 }
